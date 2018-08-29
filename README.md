@@ -1,3 +1,3 @@
-# Mojo::S3Object
+# Mojolicious::Plugin::S3Signature
 
-Very early development code (although I use currently for my projects). A lot to be done (DRY, abstraction, tests). I wanted a basic S3 helper for objects, especially a policy producer for browser-based uploads. Originally a plugin, changed from a plugin to a non-plugin module so it can be used easier outside of a non-Mojolicious app (command line back-up script). It can be used blocking or non-blocking, but I need a better understanding of the non-blocking code to make sure it is correclty done.
+Very early development code (although I use currently for my projects). A lot to be done. I discontinued any work on Mojo::S3Object as it did too much. This module is just for signing a AWS S3 request and leaves the blocking or non-blocking code for Mojolicious to perform.
