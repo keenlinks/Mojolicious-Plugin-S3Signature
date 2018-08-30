@@ -83,6 +83,8 @@ sub register {
 		};
 	});
 
+	$app->helper( s3_bucket_url => sub { $self->buck_url });
+
 	for my $method (qw/ delete get head options patch post put /) {
 		$app->helper( "s3_sign_$method" => sub {
 			$self->_sign_method( uc $method, @_[ 1 .. $#_ ] )
