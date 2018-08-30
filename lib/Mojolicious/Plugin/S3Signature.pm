@@ -23,7 +23,6 @@ has aws_host => 's3.amazonaws.com';
 has aws_request => 'aws4_request';
 has aws_service => 's3';
 
-#has method => sub { { DELETE => 'DELETE', GET => 'GET', PUT => 'PUT' } };
 has bucket_path => sub { $_[0]->bucket . '.' . $_[0]->aws_host };
 has bucket_url => sub { $_[0]->protocol . $_[0]->bucket_path };
 
@@ -49,7 +48,8 @@ sub register {
 	}
 
 	$app->helper( s3_sign_upload => sub {
-		my $upload = $_[2]->$*;
+		# Pass upload as a reference.
+		my $upload = ${ $_[2] };
 		$self->_sign_method( 'PUT', $_[1], {
 			'content-length' => $upload->size,
 			'content-type' => $upload->headers->content_type,
