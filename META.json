@@ -1,0 +1,49 @@
+{
+   "abstract" : "Mojolicious plugin for AWS Signature Version 4.",
+   "author" : [
+      "Scott Kiehn E<lt>sk.keenlinks@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.023",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-S3Signature",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.023"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7.37",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.43",
+            "Test::More" : "1.302140"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::S3Signature" : {
+         "file" : "lib/Mojolicious/Plugin/S3Signature.pm",
+         "version" : "0.01_1"
+      }
+   },
+   "release_status" : "testing",
+   "version" : "0.01_1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

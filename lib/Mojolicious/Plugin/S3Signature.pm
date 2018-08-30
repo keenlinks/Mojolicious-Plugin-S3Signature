@@ -4,7 +4,8 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Carp;
 use Digest::SHA qw(hmac_sha256 hmac_sha256_hex sha256_hex);
 use Mojo::Date;
-use Mojo::Util qw(monkey_patch slugify);
+use Mojo::JSON qw(encode_json);
+use Mojo::Util qw(b64_encode monkey_patch slugify);
 
 our $VERSION = '0.01_1';
 
@@ -22,6 +23,7 @@ has aws_auth_alg => 'AWS4-HMAC-SHA256';
 has aws_host => 's3.amazonaws.com';
 has aws_request => 'aws4_request';
 has aws_service => 's3';
+has policy_expiration => 900; # 15 minutes
 
 has bucket_path => sub { $_[0]->bucket . '.' . $_[0]->aws_host };
 has bucket_url => sub { $_[0]->protocol . $_[0]->bucket_path };
@@ -29,6 +31,11 @@ has bucket_url => sub { $_[0]->protocol . $_[0]->bucket_path };
 monkey_patch 'Mojo::Date', to_ymd => sub {
 	my @gmtime = gmtime shift->epoch;
 	sprintf '%04d%02d%02d', $gmtime[5] + 1900, $gmtime[4] + 1, $gmtime[3];
+};
+
+monkey_patch 'Mojo::Date', to_ymdhms => sub {
+	my @gmtime = gmtime shift->epoch;
+	sprintf '%04d%02d%02dT%02d%02d%02dZ', $gmtime[5] + 1900, $gmtime[4] + 1, $gmtime[3], $gmtime[2], $gmtime[1], $gmtime[0];
 };
 
 sub register {
@@ -41,11 +48,52 @@ sub register {
 	$self->protocol( $conf->{protocol} ) if $conf->{protocol};
 	$self->region( $conf->{region} ) if $conf->{region};
 
+	$app->helper( s3_browser_policy => sub {
+		my ( $c, $params ) = @_;
+		my $date = Mojo::Date->new;
+		my $credential = $self->_credential( $date );
+
+		my $policy = encode_json({
+			expiration => Mojo::Date->new( time + $self->policy_expiration )->to_datetime,
+			conditions => [
+				{bucket => $self->bucket},
+				{'x-amz-algorithm' => $self->aws_auth_alg},
+				{'x-amz-credential' => $credential},
+				{'x-amz-date' => $date->to_ymdhms},
+				{acl => 'public-read'},
+				{key => $params->{filename}},
+				{'content-type' => $params->{filetype}},
+				['content-length-range', 0, $params->{filesize}],
+				{success_action_status => '200'}
+			]
+		});
+
+		my $base64_policy = b64_encode $policy, '';
+
+		return {
+			'x-amz-algorithm' => $self->aws_auth_alg,
+			'x-amz-credential' => $credential,
+			'x-amz-date' => $date->to_ymdhms,
+			acl => 'public-read',
+			key => $params->{filename},
+			'content-type' => $params->{filetype},
+			success_action_status => '200',
+			policy => $base64_policy,
+			'x-amz-signature' => $self->_sign_the_string( $base64_policy ),
+		};
+	});
+
 	for my $method (qw/ delete get head options patch post put /) {
 		$app->helper( "s3_sign_$method" => sub {
 			$self->_sign_method( uc $method, @_[ 1 .. $#_ ] )
 		});
 	}
+
+	$app->helper( s3_sign_copy => sub {
+		$self->_sign_method( 'PUT', $_[2], {
+			'x-amz-copy-source' => $self->bucket . '/' . $_[1]
+		});
+	});
 
 	$app->helper( s3_sign_upload => sub {
 		# Pass upload as a reference.
@@ -127,3 +175,35 @@ sub _string_to_sign {
 }
 
 1;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Mojolicious::Plugin::S3Signature - Mojolicious plugin for AWS Signature Version 4.
+
+=head1 VERSION
+
+0.01_1
+
+=head1 SOURCE REPOSITORY
+
+L<http://github.com/keenlinks/Mojolicious-Plugin-S3Signature>
+
+=head1 AUTHOR
+
+Scott Kiehn E<lt>sk.keenlinks@gmail.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2018 - Scott Kiehn
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=cut

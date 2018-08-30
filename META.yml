@@ -1,0 +1,25 @@
+---
+abstract: 'Mojolicious plugin for AWS Signature Version 4.'
+author:
+  - 'Scott Kiehn E<lt>sk.keenlinks@gmail.comE<gt>'
+build_requires:
+  Test::Exception: '0.43'
+  Test::More: '1.302140'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.023, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-S3Signature
+provides:
+  Mojolicious::Plugin::S3Signature:
+    file: lib/Mojolicious/Plugin/S3Signature.pm
+    version: 0.01_1
+requires:
+  Mojolicious: '7.37'
+  perl: '5.008001'
+version: 0.01_1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
