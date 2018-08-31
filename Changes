@@ -1,0 +1,7 @@
+Revision history for Perl module Mojolicious-Plugin-S3Signature
+
+0.01_2 2018-08-31
+  - Removed bucket_url helper
+
+0.01_1 2018-08-30
+  - Initial release

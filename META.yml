@@ -17,9 +17,9 @@ name: Mojolicious-Plugin-S3Signature
 provides:
   Mojolicious::Plugin::S3Signature:
     file: lib/Mojolicious/Plugin/S3Signature.pm
-    version: 0.01_1
+    version: 0.01_2
 requires:
   Mojolicious: '7.37'
   perl: '5.008001'
-version: 0.01_1
+version: 0.01_2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

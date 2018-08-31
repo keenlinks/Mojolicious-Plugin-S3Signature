@@ -7,7 +7,7 @@ use Mojo::Date;
 use Mojo::JSON qw(encode_json);
 use Mojo::Util qw(b64_encode monkey_patch slugify);
 
-our $VERSION = '0.01_1';
+our $VERSION = '0.01_2';
 
 # Required
 has access_key => sub { croak 'Parameter "access_key" is mandatory in the constructor.' };
@@ -82,8 +82,6 @@ sub register {
 			'x-amz-signature' => $self->_sign_the_string( $base64_policy ),
 		};
 	});
-
-	$app->helper( s3_bucket_url => sub { $self->bucket_url });
 
 	for my $method (qw/ delete get head options patch post put /) {
 		$app->helper( "s3_sign_$method" => sub {
@@ -187,7 +185,7 @@ Mojolicious::Plugin::S3Signature - Mojolicious plugin for AWS Signature Version 
 
 =head1 VERSION
 
-0.01_1
+0.01_2
 
 =head1 SOURCE REPOSITORY
 
